@@ -17,14 +17,14 @@ export const ImageGalleryItem = ({ image }) => {
       <img
         src={image.webformatURL}
         alt={image.tags}
-        onClick={openModal} // Додайте обробник кліку, щоб відкрити модальне вікно
+        onClick={openModal} // Відкрити модальне вікно при кліку на зображення
         style={{ cursor: 'pointer' }}
       />
       {modalIsOpen && (
         <Modal
           isOpen={modalIsOpen}
           onClose={closeModal}
-          imageSrc={image.largeImageURL} // Передайте велике зображення для відображення в модальному вікні
+          imageSrc={image.webformatURL} 
           imageAlt={image.tags}
         />
       )}

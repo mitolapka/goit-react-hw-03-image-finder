@@ -15,13 +15,13 @@ export const Modal = ({ isOpen, onClose, imageSrc, imageAlt }) => {
     };
 
     if (isOpen) {
-      document.addEventListener('keydown', handleKeyDown);
-      document.addEventListener('click', handleClickOutside);
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('click', handleClickOutside);
     }
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.removeEventListener('click', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('click', handleClickOutside);
     };
   }, [isOpen, onClose]);
 
@@ -32,7 +32,7 @@ export const Modal = ({ isOpen, onClose, imageSrc, imageAlt }) => {
   return (
     <div className="Overlay" onClick={onClose}>
       <div className="Modal">
-        <img src={imageSrc} alt={imageAlt}/>
+        <img src={imageSrc} alt={imageAlt} />
       </div>
     </div>
   );

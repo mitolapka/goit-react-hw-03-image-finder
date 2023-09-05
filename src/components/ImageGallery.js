@@ -3,7 +3,7 @@ import { ImageGalleryItem } from './ImageGalleryItem';
 import { Button } from './Button';
 import { Rings } from 'react-loader-spinner';
 
-export const ImageGallery = ({ apiKey, searchQuery, page, onLoadMore, key }) => {
+export const ImageGallery = ({ apiKey, searchQuery, page, onLoadMore, componentKey }) => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalImages, setTotalImages] = useState(0);
@@ -11,7 +11,7 @@ export const ImageGallery = ({ apiKey, searchQuery, page, onLoadMore, key }) => 
   useEffect(() => {
     if (!searchQuery) return;
     fetchImages();
-  }, [apiKey, searchQuery, page, key]);
+  }, [apiKey, searchQuery, page, componentKey]);
 
   const fetchImages = async () => {
     setLoading(true);
