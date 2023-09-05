@@ -35,7 +35,6 @@ export const ImageGallery = ({ apiKey, searchQuery, page, onLoadMore, componentK
           downloads: image.downloads,
         }));
 
-        // Фільтруємо унікальні зображення і додаємо їх до попереднього списку
         setImages((prevImages) => [...prevImages, ...newImages.filter(newImage => !prevImages.some(prevImage => prevImage.id === newImage.id))]);
         setTotalImages(data.totalHits);
       } catch (error) {
@@ -50,10 +49,9 @@ export const ImageGallery = ({ apiKey, searchQuery, page, onLoadMore, componentK
   }, [apiKey, searchQuery, page, componentKey]);
 
   const handleLoadMore = () => {
-    onLoadMore(); // Виклик функції з батьківського компонента для збільшення сторінки
+    onLoadMore(); 
   };
 
-  // Решта коду залишається незмінним
 
   return (
     <div>

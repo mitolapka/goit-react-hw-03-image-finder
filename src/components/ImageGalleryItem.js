@@ -17,7 +17,7 @@ export const ImageGalleryItem = ({ image }) => {
       <img
         src={image.webformatURL}
         alt={image.tags}
-        onClick={openModal} // Відкрити модальне вікно при кліку на зображення
+        onClick={openModal} 
         style={{ cursor: 'pointer' }}
       />
       {modalIsOpen && (

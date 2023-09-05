@@ -4,13 +4,13 @@ export const Modal = ({ isOpen, onClose, imageSrc, imageAlt }) => {
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
-        onClose(); // Закрити модальне вікно при натисканні клавіші ESC
+        onClose(); 
       }
     };
 
     const handleClickOutside = (e) => {
       if (e.target === e.currentTarget) {
-        onClose(); // Закрити модальне вікно при кліку на оверлей
+        onClose(); 
       }
     };
 
