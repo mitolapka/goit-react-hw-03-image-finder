@@ -3,18 +3,19 @@ import { ImageGalleryItem } from './ImageGalleryItem';
 import { Button } from './Button';
 import { Rings } from 'react-loader-spinner';
 
-export const ImageGallery = ({ apiKey, searchQuery, page, onLoadMore }) => {
+export const ImageGallery = ({ apiKey, searchQuery, page, onLoadMore, key }) => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [totalImages, setTotalImages] = useState(0);
 
   useEffect(() => {
     if (!searchQuery) return;
-      fetchImages();
-  }, [apiKey, searchQuery, page]);
+    fetchImages();
+  }, [apiKey, searchQuery, page, key]);
 
   const fetchImages = async () => {
     setLoading(true);
+
     try {
       const url = `https://pixabay.com/api/?key=${apiKey}&q=${encodeURIComponent(
         searchQuery
@@ -38,13 +39,18 @@ export const ImageGallery = ({ apiKey, searchQuery, page, onLoadMore }) => {
         downloads: image.downloads,
       }));
 
-      setImages((prevImages) => [...prevImages, ...newImages]);
+      // Фільтруємо унікальні зображення і додаємо їх до попереднього списку
+      setImages((prevImages) => [...prevImages, ...newImages.filter(newImage => !prevImages.some(prevImage => prevImage.id === newImage.id))]);
       setTotalImages(data.totalHits);
     } catch (error) {
       console.error('Error fetching images:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLoadMore = () => {
+    onLoadMore(); // Виклик функції з батьківського компонента для збільшення сторінки
   };
 
   return (
@@ -56,16 +62,21 @@ export const ImageGallery = ({ apiKey, searchQuery, page, onLoadMore }) => {
       </ul>
       {loading && (
         <div className="spinner-container">
-          <Rings color="#303f9f" height="80"
-  width="80"
-  radius="6"
-  wrapperStyle={{}}
-  wrapperClass=""
-  visible={true}
-  ariaLabel="rings-loading" />
+          <Rings
+            color="#303f9f"
+            height="80"
+            width="80"
+            radius="6"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+            ariaLabel="rings-loading"
+          />
         </div>
       )}
-      {images.length > 0 && images.length < totalImages && <Button onLoadMore={onLoadMore} />}
+      {images.length > 0 && images.length < totalImages && (
+        <Button onLoadMore={handleLoadMore} />
+      )}
       {images.length === 0 && searchQuery && <p>No images found.</p>}
     </div>
   );
