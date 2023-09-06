@@ -11,7 +11,6 @@ export class App extends Component {
       images: [],
       searchQuery: '',
       page: 1,
-      key: 0,
       loading: false, 
     };
   }
@@ -22,7 +21,6 @@ export class App extends Component {
         images: [],
         searchQuery: query,
         page: 1,
-        key: this.state.key + 1,
         loading: false, 
       },
       this.fetchImages
@@ -81,7 +79,7 @@ export class App extends Component {
 
 
   render() {
-    const { images, searchQuery, page, key, loading } = this.state;
+    const { images, searchQuery, loading } = this.state;
 
     return (
       <div className="App">
