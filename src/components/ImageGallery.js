@@ -28,9 +28,9 @@ export class ImageGallery extends Component {
             />
           </div>
         )}
-        {images.length > 0 && (
-          <Button onLoadMore={this.props.onLoadMore} />
-        )}
+        {!loading && images.length < this.props.totalImages && (
+  <Button onLoadMore={this.props.onLoadMore} />
+)}
         {images.length === 0 && searchQuery && !loading && <p>No images found.</p>}
 
       </div>

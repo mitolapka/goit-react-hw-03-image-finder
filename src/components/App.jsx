@@ -12,7 +12,23 @@ export class App extends Component {
       searchQuery: '',
       page: 1,
       loading: false, 
+      totalImages: 0
     };
+  }
+
+  componentDidMount() {
+    if (this.state.searchQuery) {
+      this.fetchImages();
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (
+      this.state.searchQuery !== prevState.searchQuery ||
+      this.state.page !== prevState.page
+    ) {
+      this.fetchImages();
+    }
   }
 
   handleSearch = (query) => {
@@ -22,73 +38,66 @@ export class App extends Component {
         searchQuery: query,
         page: 1,
         loading: false, 
-      },
-      this.fetchImages
+      }
     );
   };
 
   fetchImages = async () => {
-  const { searchQuery, page } = this.state;
-  const url = `https://pixabay.com/api/?key=${API_KEY}&q=${encodeURIComponent(
-    searchQuery
-  )}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=12`;
+    const { searchQuery, page } = this.state;
+    const url = `https://pixabay.com/api/?key=${API_KEY}&q=${encodeURIComponent(
+      searchQuery
+    )}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=12`;
 
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
 
-    if (data.totalHits === 0) {
-      console.log('No images found.');
-      return;
+      if (data.totalHits === 0) {
+        console.log('No images found.');
+        return;
+      }
+
+      const newImages = data.hits.map((image) => ({
+        id: image.id,
+        webformatURL: image.webformatURL,
+        tags: image.tags,
+        likes: image.likes,
+        views: image.views,
+        comments: image.comments,
+        downloads: image.downloads,
+      }));
+
+      this.setState((prevState) => ({
+  images: [...prevState.images, ...newImages],
+  loading: false,
+  totalImages: data.totalHits, 
+}));
+    } catch (error) {
+      console.error('Error fetching images:', error);
+      throw error; 
     }
-
-    const newImages = data.hits.map((image) => ({
-      id: image.id,
-      webformatURL: image.webformatURL,
-      tags: image.tags,
-      likes: image.likes,
-      views: image.views,
-      comments: image.comments,
-      downloads: image.downloads,
-    }));
-
-    this.setState((prevState) => ({
-      images: [...prevState.images, ...newImages],
-    }));
-  } catch (error) {
-    console.error('Error fetching images:', error);
-    throw error; 
-  }
-};
-
+  };
 
   loadMoreImages = async () => {
-  this.setState({
-    page: this.state.page + 1,
-    loading: true, 
-  });
-
-  try {
-    await this.fetchImages();
-  } catch (error) {
-    console.error('Error loading more images:', error);
-  } finally {
-    this.setState({ loading: false });
-  }
-};
-
+    this.setState({
+      page: this.state.page + 1,
+      loading: true, 
+    });
+  };
 
   render() {
-    const { images, searchQuery, loading } = this.state;
+    const { images, searchQuery, loading, totalImages } = this.state;
 
     return (
       <div className="App">
         <Searchbar onSearch={this.handleSearch} />
         <ImageGallery
-          searchQuery={searchQuery}
+          
           onLoadMore={this.loadMoreImages}
           images={images}
           loading={loading} 
+          searchQuery={searchQuery}
+          totalImages={totalImages}
         />
       </div>
     );
