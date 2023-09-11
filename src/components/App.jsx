@@ -16,11 +16,7 @@ export class App extends Component {
     };
   }
 
-  componentDidMount() {
-    if (this.state.searchQuery) {
-      this.fetchImages();
-    }
-  }
+ 
 
   componentDidUpdate(prevProps, prevState) {
     if (
@@ -38,6 +34,7 @@ export class App extends Component {
         searchQuery: query,
         page: 1,
         loading: false, 
+        totalImages: 0
       }
     );
   };
