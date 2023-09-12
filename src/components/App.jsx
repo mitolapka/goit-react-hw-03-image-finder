@@ -1,46 +1,34 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Searchbar } from './SearchBar';
 import { ImageGallery } from './ImageGallery';
+import { Modal } from './Modal';
 
 const API_KEY = '38400499-9377fca084918dc6c22b9bff8';
 
-export class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      images: [],
-      searchQuery: '',
-      page: 1,
-      loading: false, 
-      totalImages: 0
-    };
-  }
+export const App = () => {
+  const [images, setImages] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [totalImages, setTotalImages] = useState(0);
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
- 
-
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      this.state.searchQuery !== prevState.searchQuery ||
-      this.state.page !== prevState.page
-    ) {
-      this.fetchImages();
+  useEffect(() => {
+    if (searchQuery && (searchQuery !== '' || page !== 1)) {
+      fetchImages();
     }
-  }
+  }, [searchQuery, page]);
 
-  handleSearch = (query) => {
-    this.setState(
-      {
-        images: [],
-        searchQuery: query,
-        page: 1,
-        loading: false, 
-        totalImages: 0
-      }
-    );
+  const handleSearch = (query) => {
+    setImages([]);
+    setSearchQuery(query);
+    setPage(1);
+    setLoading(false);
+    setTotalImages(0);
   };
 
-  fetchImages = async () => {
-    const { searchQuery, page } = this.state;
+  const fetchImages = async () => {
     const url = `https://pixabay.com/api/?key=${API_KEY}&q=${encodeURIComponent(
       searchQuery
     )}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=12`;
@@ -64,39 +52,50 @@ export class App extends Component {
         downloads: image.downloads,
       }));
 
-      this.setState((prevState) => ({
-  images: [...prevState.images, ...newImages],
-  loading: false,
-  totalImages: data.totalHits, 
-}));
+      setImages((prevImages) => [...prevImages, ...newImages]);
+      setLoading(false);
+      setTotalImages(data.totalHits);
     } catch (error) {
       console.error('Error fetching images:', error);
-      throw error; 
+      throw error;
     }
   };
 
-  loadMoreImages = async () => {
-    this.setState({
-      page: this.state.page + 1,
-      loading: true, 
-    });
+  const loadMoreImages = () => {
+    setPage((prevPage) => prevPage + 1);
+    setLoading(true);
   };
 
-  render() {
-    const { images, searchQuery, loading, totalImages } = this.state;
+  const openModal = (image) => {
+    setSelectedImage(image);
+    setModalIsOpen(true);
+  };
 
-    return (
-      <div className="App">
-        <Searchbar onSearch={this.handleSearch} />
-        <ImageGallery
-          
-          onLoadMore={this.loadMoreImages}
-          images={images}
-          loading={loading} 
-          searchQuery={searchQuery}
-          totalImages={totalImages}
+  const closeModal = () => {
+    setSelectedImage(null);
+    setModalIsOpen(false);
+  };
+
+  return (
+    <div className="App">
+      <Searchbar onSearch={handleSearch} />
+      <ImageGallery
+        onLoadMore={loadMoreImages}
+        images={images}
+        loading={loading}
+        searchQuery={searchQuery}
+        totalImages={totalImages}
+        onImageClick={openModal}
+      />
+      {modalIsOpen && selectedImage && (
+        <Modal
+          isOpen={modalIsOpen}
+          onClose={closeModal}
+          imageSrc={selectedImage.webformatURL}
+          imageAlt={selectedImage.tags}
         />
-      </div>
-    );
-  }
-}
+      )}
+    </div>
+  );
+};
+
