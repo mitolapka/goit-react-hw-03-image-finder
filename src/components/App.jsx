@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Searchbar } from './SearchBar';
 import { ImageGallery } from './ImageGallery';
 import { Modal } from './Modal';
@@ -13,44 +13,7 @@ export const App = () => {
   const [totalImages, setTotalImages] = useState(0);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-const fetchImages = useCallback(async () => {
-    const url = `https://pixabay.com/api/?key=${API_KEY}&q=${encodeURIComponent(
-      searchQuery
-    )}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=12`;
 
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-
-      if (data.totalHits === 0) {
-        console.log('No images found.');
-        return;
-      }
-
-      const newImages = data.hits.map((image) => ({
-        id: image.id,
-        webformatURL: image.webformatURL,
-        tags: image.tags,
-        likes: image.likes,
-        views: image.views,
-        comments: image.comments,
-        downloads: image.downloads,
-      }));
-
-      setImages((prevImages) => [...prevImages, ...newImages]);
-      setLoading(false);
-      setTotalImages(data.totalHits);
-    } catch (error) {
-      console.error('Error fetching images:', error);
-      throw error;
-    }
-}, [searchQuery, page]);
-  
-  useEffect(() => {
-    if (searchQuery && (searchQuery !== '' || page !== 1)) {
-      fetchImages();
-    }
-  }, [searchQuery, page, fetchImages]);
 
   const handleSearch = (query) => {
     setImages([]);
@@ -59,8 +22,43 @@ const fetchImages = useCallback(async () => {
     setLoading(false);
     setTotalImages(0);
   };
+  useEffect(() => {
+    const fetchImages = async () => {
+      const url = `https://pixabay.com/api/?key=${API_KEY}&q=${encodeURIComponent(
+        searchQuery
+      )}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=12`;
 
-   
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.totalHits === 0) {
+          console.log('No images found.');
+          return;
+        }
+
+        const newImages = data.hits.map((image) => ({
+          id: image.id,
+          webformatURL: image.webformatURL,
+          tags: image.tags,
+          likes: image.likes,
+          views: image.views,
+          comments: image.comments,
+          downloads: image.downloads,
+        }));
+
+        setImages((prevImages) => [...prevImages, ...newImages]);
+        setLoading(false);
+        setTotalImages(data.totalHits);
+      } catch (error) {
+        console.error('Error fetching images:', error);
+        throw error;
+      }
+    };
+     if (searchQuery && (searchQuery !== '' || page !== 1)) {
+    fetchImages();
+  }
+  }, [searchQuery, page]);
 
   const loadMoreImages = () => {
     setPage((prevPage) => prevPage + 1);
