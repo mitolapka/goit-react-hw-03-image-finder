@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Searchbar } from './SearchBar';
 import { ImageGallery } from './ImageGallery';
 import { Modal } from './Modal';
@@ -13,22 +13,7 @@ export const App = () => {
   const [totalImages, setTotalImages] = useState(0);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-
-  useEffect(() => {
-    if (searchQuery && (searchQuery !== '' || page !== 1)) {
-      fetchImages();
-    }
-  }, [searchQuery, page]);
-
-  const handleSearch = (query) => {
-    setImages([]);
-    setSearchQuery(query);
-    setPage(1);
-    setLoading(false);
-    setTotalImages(0);
-  };
-
-  const fetchImages = async () => {
+const fetchImages = useCallback(async () => {
     const url = `https://pixabay.com/api/?key=${API_KEY}&q=${encodeURIComponent(
       searchQuery
     )}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=12`;
@@ -59,7 +44,23 @@ export const App = () => {
       console.error('Error fetching images:', error);
       throw error;
     }
+}, [searchQuery, page]);
+  
+  useEffect(() => {
+    if (searchQuery && (searchQuery !== '' || page !== 1)) {
+      fetchImages();
+    }
+  }, [searchQuery, page, fetchImages]);
+
+  const handleSearch = (query) => {
+    setImages([]);
+    setSearchQuery(query);
+    setPage(1);
+    setLoading(false);
+    setTotalImages(0);
   };
+
+   
 
   const loadMoreImages = () => {
     setPage((prevPage) => prevPage + 1);
